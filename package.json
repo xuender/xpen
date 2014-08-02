@@ -1,0 +1,37 @@
+{
+  "name": "xpen",
+  "version": "0.0.1",
+  "description": "论坛",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xuender/xpen.git"
+  },
+  "keywords": [
+    "xpen"
+  ],
+  "author": "ender",
+  "license": "APACHE2",
+  "bugs": {
+    "url": "https://github.com/xuender/xpen/issues"
+  },
+  "homepage": "https://github.com/xuender/xpen",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-bumpx": "~0.1.5",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-coffeelint": "~0.0.7",
+    "grunt-contrib-coffee": "~0.7.0",
+    "karma-phantomjs-launcher": "~0.1.1",
+    "grunt-karma": "~0.6.2"
+  },
+  "scripts": {
+    "test": "grunt travis --verbose"
+  }
+}
