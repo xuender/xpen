@@ -5,15 +5,13 @@ import (
   "code.google.com/p/go.net/websocket"
   log "github.com/cihub/seelog"
   "net/http"
+  "../utils"
 )
 
-type user struct {
-  name     string
-  email    string
-  gravatar string
-}
-//var onlines map[*websocket.Conn]int
-var onlines = make(map[*websocket.Conn]int)
+
+// 在线用户
+var onlines = make(map[*websocket.Conn]User)
+var messages = utils.NewStack()
 
 // 接收ws请求
 func wsHandler(ws *websocket.Conn) {
@@ -26,19 +24,42 @@ func wsHandler(ws *websocket.Conn) {
       break
     }
     log.Debug("接收信息: ", reply)
-    count, ok := onlines[ws]
+    _, ok := onlines[ws]
     if ok {
-      onlines[ws] = count + 1
-      log.Debug("第%s次访问", count)
+      //onlines[ws] = count + 1
     } else {
-      onlines[ws] = 1
+      //onlines[ws] = 1
       log.Debug("初始化, 在线用户:",len(onlines))
+      user := User {
+        Nick: "test1",
+        Email: "xxxx@xxx",
+      }
+      onlines[ws] = user
+      log.Debug(onlines)
+      var mUsers Msg
+      for _, u := range onlines{
+        mUsers.Users = append(mUsers.Users, User{Nick: u.Nick, Email: u.Email})
+      }
+      for w, _ := range onlines{
+        if err = websocket.JSON.Send(w, mUsers); err != nil {
+          log.Error("不能发送消息到客户端")
+          break
+        }
+      }
     }
+    m := Message{
+      Content: reply,
+      Time: utils.Now(),
+      User: onlines[ws],
+    }
+    messages.Push(m)
+    if messages.Len() > 10{
+      messages.Pop()
+    }
+    log.Debug("消息数量:%d", messages.Len())
     for w, u := range onlines{
-      msg := "返回:  " + reply
-      log.Debug("发送客户端: ", msg)
       log.Debug("User:", u)
-      if err = websocket.Message.Send(w, msg); err != nil {
+      if err = websocket.JSON.Send(w, m); err != nil {
         log.Error("不能发送消息到客户端")
         break
       }
