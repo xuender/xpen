@@ -9,6 +9,7 @@ angular.module('xpen', [
   'ngSocket'
 ])
 XpenCtrl = ($scope, $modal, ngSocket)->
+  ### 主控制器 ###
   $scope.msg = ''
   ws = ngSocket("ws://#{location.origin.split('//')[1]}/ws")
   ws.onMessage((msg)->

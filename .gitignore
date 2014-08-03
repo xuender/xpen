@@ -25,3 +25,4 @@ _testmain.go
 # js
 bower_components/
 node_modules/
+src/static/
