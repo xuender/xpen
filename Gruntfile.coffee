@@ -48,8 +48,19 @@ module.exports = (grunt)->
         files: [
           cwd: 'bower_components/angular/'
           src: [
+            'angular.js'
             'angular.min.js'
             'angular.min.js.map'
+          ]
+          dest: 'src/static/js'
+          expand: true
+          filter: 'isFile'
+        ]
+      storage:
+        files: [
+          cwd: 'bower_components/angular-local-storage/'
+          src: [
+            'angular-local-storage.min.js'
           ]
           dest: 'src/static/js'
           expand: true
