@@ -16,19 +16,34 @@ XpenCtrl = ($scope, $modal, ngSocket, lss)->
   ws.onMessage((msg)->
     console.log('接收倒消息:', msg)
   )
+  $scope.isLogin = false
   $scope.init = ->
     ### 初始化 ###
     user = lss.get('user')
     if user == null
-      console.info('未知的用户')
+      $scope.user =
+        email: ''
+        nick: ''
     else
       $scope.user = user
-      console.debug('user:', user)
+      $scope.isLogin = true
+  $scope.logout = ->
+    ### 登出 ###
+    $scope.user =
+      email: ''
+      nick: ''
+    lss.remove('user')
+    $scope.isLogin = false
+  $scope.login = ->
+    ### 登录 ###
+    lss.set('user', $scope.user)
+    $scope.isLogin = true
   $scope.send = ->
     ### 发送消息 ###
     ws.send(
       msg:$scope.msg
     )
   $scope.init()
+  console.info $scope.isLogin
 
 XpenCtrl.$inject = ['$scope', '$modal', 'ngSocket', 'localStorageService']

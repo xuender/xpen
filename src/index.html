@@ -2,11 +2,34 @@
 <html ng-app="xpen" ng-csp>
   <head>
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/main.css" rel="stylesheet"/>
     <meta charset="utf-8" />
     <title>聊天室</title>
   </head>
   <body ng-controller="XpenCtrl">
-    <nav class="navbar navbar-default" role="navigation">
+    <div ng-hide="isLogin" class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">用户登录</h4>
+        </div><!-- modal-header -->
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="i_email">电子邮箱地址</label>
+            <input ng-model="user.email"
+            type="email" class="form-control" id="i_email" placeholder="输入邮箱地址"/>
+          </div><!-- form-group -->
+          <div class="form-group">
+            <label for="i_nick">昵称</label>
+            <input ng-model="user.nick"
+            type="text" class="form-control" id="i_nick" placeholder="输入您的昵称"/>
+          </div><!-- form-group -->
+        </div><!-- modal-body -->
+        <div class="modal-footer">
+          <button ng-click="login()" class="btn btn-primary">登录</button>
+        </div><!-- modal-footer -->
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+    <nav ng-show="isLogin" class="navbar navbar-default" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -23,18 +46,18 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">xuender <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.nick }} <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="#">修改昵称</a></li>
+                <li><a ng-click="isLogin=false">修改用户信息</a></li>
                 <li class="divider"></li>
-                <li><a href="#">退出</a></li>
+                <li><a ng-click="logout()">退出</a></li>
               </ul>
             </li>
           </ul>
         </div><!-- navbar-collapse -->
       </div><!-- container-fluid -->
     </nav>
-    <div class="container-fluid">
+    <div ng-show="isLogin" class="container-fluid">
       <div class="col-xs-4">
         <ul class="nav nav-pills nav-stacked">
           <li class="active"><a href="#">张三</a></li>

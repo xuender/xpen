@@ -5,6 +5,7 @@ module.exports = (grunt)->
   grunt.loadNpmTasks('grunt-contrib-copy')
   grunt.loadNpmTasks('grunt-karma')
   grunt.loadNpmTasks('grunt-contrib-coffee')
+  grunt.loadNpmTasks('grunt-contrib-cssmin')
   grunt.loadNpmTasks('grunt-coffeelint')
   grunt.loadNpmTasks('grunt-bumpx')
 
@@ -97,6 +98,16 @@ module.exports = (grunt)->
           expand: true
           filter: 'isFile'
         ]
+      css:
+        files: [
+          cwd: 'src/css'
+          src: [
+            'main.css'
+          ]
+          dest: 'src/static/css'
+          expand: true
+          filter: 'isFile'
+        ]
     coffee:
       options:
         bare: true
@@ -111,6 +122,13 @@ module.exports = (grunt)->
           'dist/static/js/main.min.js': [
             'src/static/js/main.min.js'
           ]
+    cssmin:
+      toolbox:
+        expand: true
+        cwd: 'src/static/css/'
+        src: ['*.css', '!*.min.css'],
+        dest: 'dist/css/'
+        #ext: '.min.css'
     watch:
       html:
         files: [
