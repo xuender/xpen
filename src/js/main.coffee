@@ -8,13 +8,24 @@ angular.module('xpen', [
   'ui.bootstrap'
   'ngSocket'
   'LocalStorageModule'
+  'hotkey'
 ])
 XpenCtrl = ($scope, $modal, ngSocket, lss)->
   ### 主控制器 ###
   $scope.msg = ''
   ws = ngSocket("ws://#{location.origin.split('//')[1]}/ws")
-  ws.onMessage((msg)->
-    console.log('接收倒消息:', msg)
+  $scope.users = []
+  $scope.messages = []
+  $scope.showMessages = (messages)->
+    ### 显示消息 ###
+    console.info messages
+    $scope.messages = $scope.messages.concat messages
+  ws.onMessage((data)->
+    msg = JSON.parse(data.data)
+    $('.well')[0].scrollTop = $('.well')[0].scrollHeight
+    switch msg.Command
+      when 'users' then $scope.users = msg.Users
+      when 'chat' then $scope.showMessages(msg.Messages)
   )
   $scope.isLogin = false
   $scope.init = ->
@@ -27,6 +38,10 @@ XpenCtrl = ($scope, $modal, ngSocket, lss)->
     else
       $scope.user = user
       $scope.isLogin = true
+      $scope.wsLogin()
+    ws.send(
+      Command: 'init'
+    )
   $scope.logout = ->
     ### 登出 ###
     $scope.user =
@@ -38,12 +53,35 @@ XpenCtrl = ($scope, $modal, ngSocket, lss)->
     ### 登录 ###
     lss.set('user', $scope.user)
     $scope.isLogin = true
+    $scope.wsLogin()
   $scope.send = ->
     ### 发送消息 ###
     ws.send(
-      msg:$scope.msg
+      Command: 'chat'
+      Messages: [
+        {
+          Content: $scope.msg
+        }
+      ]
+    )
+    $scope.msg = ''
+  $scope.wsLogin = ->
+    ### 远程用户登陆 ###
+    console.info('login', $scope.user)
+    ws.send(
+      Command: 'login'
+      Source: $scope.user
     )
   $scope.init()
-  console.info $scope.isLogin
-
 XpenCtrl.$inject = ['$scope', '$modal', 'ngSocket', 'localStorageService']
+
+
+chatResized = ->
+  ### 聊天窗口缩放 ###
+  chat_height = $.getDocHeight() - 130
+  $('.well').css('height',chat_height)
+$ ->
+  $.getDocHeight = ->
+    Math.max($(document).height(), $(window).height(), document.documentElement.clientHeight)
+  chatResized()
+  window.onresize = chatResized
