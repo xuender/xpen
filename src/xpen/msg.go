@@ -20,7 +20,7 @@ type Message struct {
 
 // 消息列表
 type Msg struct {
-	// 命令 login 登录, chat 聊天, users 用户列表, init 获取聊天记录
+	// 命令 login 登录, chat 聊天, users 用户列表, init 获取聊天记录, logout 登出
 	Command string
 	// 消息列表
 	Messages []Message

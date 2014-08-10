@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title">用户登录</h4>
+</div><!-- modal-header -->
+<div class="modal-body">
+  <form name="loginForm" class="login">
+    <div class="form-group"
+    ng-class="{'has-error': old && (loginForm.email.$error.required || loginForm.email.$error.email) }">
+      <label class="control-label" for="i_email">电子邮箱地址</label>
+      <input ng-model="user.email" enter required name="email"
+      type="email" class="form-control" id="i_email" placeholder="输入邮箱地址"/>
+      <span class="help-block" ng-show="old && loginForm.email.$error.required">不能为空</span>
+      <span class="help-block" ng-show="old && loginForm.email.$error.email">不是邮箱地址</span>
+    </div><!-- form-group -->
+    <div class="form-group" 
+    ng-class="{'has-error': old && loginForm.nick.$error.required}">
+      <label class="control-label" for="i_nick">昵称</label>
+      <input ng-model="user.nick" enter="ok(loginForm.$valid)" required name="nick"
+      type="text" class="form-control" id="i_nick" placeholder="输入您的昵称"/>
+      <span class="help-block" ng-show="old && loginForm.nick.$error.required">不能为空</span>
+    </div><!-- form-group -->
+  </form>
+</div><!-- modal-body -->
+<div class="modal-footer">
+  <button ng-click="ok(loginForm.$valid)" ng-disabled="old && !loginForm.$valid"
+  class="btn btn-primary">登录</button>
+  <button ng-hide="init" class="btn btn-warning" ng-click="cancel()">取消</button>
+</div><!-- modal-footer -->

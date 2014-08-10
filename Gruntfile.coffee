@@ -26,7 +26,7 @@ module.exports = (grunt)->
         files: [
           cwd: 'src'
           src: [
-            'index.html'
+            '*.html'
           ]
           dest: 'src/static'
           filter: 'isFile'
@@ -135,6 +135,7 @@ module.exports = (grunt)->
         files:
           'src/static/js/main.min.js': [
             'src/js/main.coffee'
+            'src/js/login.coffee'
           ]
     uglify:
       main:
@@ -150,6 +151,11 @@ module.exports = (grunt)->
         dest: 'dist/css/'
         #ext: '.min.css'
     watch:
+      css:
+        files: [
+          'src/css/*.css'
+        ]
+        tasks: ['copy:css']
       html:
         files: [
           'src/*.html'
