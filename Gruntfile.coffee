@@ -78,6 +78,17 @@ module.exports = (grunt)->
           expand: true
           filter: 'isFile'
         ]
+      upload:
+        files: [
+          cwd: 'bower_components/ng-file-upload'
+          src: [
+            'angular-file-upload-html5-shim.min.js'
+            'angular-file-upload.min.js'
+          ]
+          dest: 'src/static/js'
+          expand: true
+          filter: 'isFile'
+        ]
       hotkey:
         files: [
           cwd: 'bower_components/ng-hotkey'
