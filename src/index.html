@@ -43,18 +43,11 @@
             {{ u.Nick }}
           </li>
         </ul>
-        <div ng-controller="UploadCtrl">
-          <input type="file" ng-file-select="onFileSelect($files)">
-          <input type="file" ng-file-select="onFileSelect($files)" multiple accept="image/*">
-          <div class="button" ng-file-select="onFileSelect($files)" data-multiple="true"></div>
-          <div ng-file-drop="onFileSelect($files)" ng-file-drag-over-class="optional-css-class-name-or-function"
-                ng-show="dropSupported">drop files here</div>
-          <div ng-file-drop-available="dropSupported=true" 
-                ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
-          <button ng-click="upload.abort()">Cancel Upload</button>
-        </div>
       </div><!-- 4 -->
-      <div class="col-xs-10 well" style="overflow: auto;">
+      <div class="col-xs-10 well drop-box"
+      ng-controller="UploadCtrl"
+      ng-file-drop="onFileSelect($files)"
+      ng-file-drag-over-class="dragover">
         <table class="table table-striped">
           <tr ng-repeat="m in messages">
             <td class="col-xs-2">{{ m.User.Nick }}</td>

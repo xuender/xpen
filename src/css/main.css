@@ -16,6 +16,14 @@ ng\:form {
 }
 
 body {
-	background: white;
-	color: black;
+  background: white;
+  color: black;
+}
+
+.drop-box {
+  border: 5px solid white;
+  overflow: auto;
+}
+.dragover {
+  border: 5px dashed blue;
 }
