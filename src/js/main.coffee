@@ -9,7 +9,34 @@ angular.module('xpen', [
   'ngSocket'
   'LocalStorageModule'
   'hotkey'
+  'angularFileUpload'
 ])
+UploadCtrl = ($scope, $upload)->
+  $scope.onFileSelect = ($files)->
+    for file in $files
+      $scope.upload = $upload.upload(
+        url: '/upload'
+        method: 'POST'
+        #headers: {'header-key': 'header-value'},
+        #withCredentials: true,
+        #data: {myObj: $scope.myModelObj},
+        file: file, #// or list of files ($files) for html5 only
+        #fileName: 'doc.jpg' or ['1.jpg', '2.jpg', ...] // to modify the name of the file(s)
+        # customize file formData name ('Content-Desposition'), server side file variable name. 
+        #fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file' 
+        # customize how data is added to formData. See #40#issuecomment-28612000 for sample code
+        #formDataAppender: function(formData, key, val){}
+      ).progress((evt)->
+        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total))
+      ).success((data, status, headers, config)->
+        # file is uploaded successfully
+        console.log(data)
+      )
+UploadCtrl.$inject = [
+  '$scope'
+  '$upload'
+]
+
 XpenCtrl = ($scope, $modal, ngSocket, lss)->
   ### 主控制器 ###
   $scope.msg = ''
@@ -103,7 +130,12 @@ XpenCtrl = ($scope, $modal, ngSocket, lss)->
       Source: $scope.user
     )
   $scope.init()
-XpenCtrl.$inject = ['$scope', '$modal', 'ngSocket', 'localStorageService']
+XpenCtrl.$inject = [
+  '$scope'
+  '$modal'
+  'ngSocket'
+  'localStorageService'
+]
 
 chatResized = ->
   ### 聊天窗口缩放 ###
