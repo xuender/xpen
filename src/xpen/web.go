@@ -10,6 +10,7 @@ import (
   log "github.com/cihub/seelog"
   "net/http"
   "html/template"
+  "unsafe"
 )
 
 // 在线用户
@@ -28,6 +29,7 @@ func usersHandler() {
         User{Nick: u.Nick, Email: u.Email})
       }
     }
+    mUsers.Pointer = fmt.Sprintf("%d", unsafe.Pointer(w))
     if err = websocket.JSON.Send(w, mUsers); err != nil {
       log.Error("不能发送消息到客户端")
       break
@@ -37,10 +39,12 @@ func usersHandler() {
 
 // 初始化聊天记录
 func initHandler(ws *websocket.Conn, user User, msg Msg) {
+  log.Debug(unsafe.Pointer(ws))
   var err error
   var m Msg
   m.Command = "chat"
   m.Messages = messages
+  m.Pointer = fmt.Sprintf("%d", unsafe.Pointer(ws))
   if err = websocket.JSON.Send(ws, m); err != nil {
     log.Error("不能发送消息到客户端")
   }
@@ -64,12 +68,14 @@ func logoutHandler(ws *websocket.Conn, user User, msg Msg) {
 // 聊天
 func chatHandler(ws *websocket.Conn, user User, msg Msg) {
   log.Debugf("用户: %s 发来消息:%s", user.Nick, msg.Messages)
+  log.Debug(unsafe.Pointer(ws))
   var err error
   if len(msg.Messages) == 0 {
     return
   }
   msg.Messages[0].Time = utils.Now()
   msg.Messages[0].User = user
+  msg.Pointer = fmt.Sprintf("%d", unsafe.Pointer(ws))
   messages = append(messages, msg.Messages[0])
   if len(messages) > 10 { // 保留最后10条聊天记录
     messages = messages[1:11]
@@ -84,13 +90,24 @@ func chatHandler(ws *websocket.Conn, user User, msg Msg) {
     }
   }
 }
+// 查找用户
+func findUser(p string) User {
+  for w, u := range onlines {
+    if len(u.Nick) > 0{
+      if p == fmt.Sprintf("%d", unsafe.Pointer(w)){
+        return u
+      }
+    }
+  }
+  return User{Nick: "test", Email: "xx@xx"}
+}
 // 发送文件下载 TODO 需要知道谁发送的
-func sendFile(name string, url string){
+func sendFile(p string, name string, url string){
   var msg Msg
   msg.Messages = append(msg.Messages, Message{
     Content: name+"||"+url,
     Time: utils.Now(),
-    User: User{Nick: "test", Email: "xx@xx"},
+    User: findUser(p),
   })
   msg.Command = "chat"
   msg.Source = User{Nick: "xxdfd", Email: "ddf@sf"}
@@ -166,7 +183,7 @@ func uploadServer(w http.ResponseWriter, r *http.Request){
       return
     }
     defer file.Close()
-    fmt.Fprintf(w, "%v", handler.Header)
+    fmt.Fprintf(w, "%v", "ok")
     //TODO
     fname, mkerr := uploadFile(handler.Filename)
     if mkerr != nil {
@@ -180,7 +197,7 @@ func uploadServer(w http.ResponseWriter, r *http.Request){
     }
     defer f.Close()
     io.Copy(f, file)
-    sendFile(fname, handler.Filename)
+    sendFile(r.FormValue("pointer"), fname, handler.Filename)
   }
 }
 

@@ -28,6 +28,8 @@ type Msg struct {
 	Users []User
 	// 消息来源
 	Source User
+  // 来源
+  Pointer string
 }
 
 // ws消息
