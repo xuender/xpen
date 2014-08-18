@@ -12,26 +12,50 @@ angular.module('xpen', [
   'angularFileUpload'
 ])
 UploadCtrl = ($scope, $upload)->
+  $scope.progress = 0
+  $scope.abort = (index)->
+    ### 停止 ###
+    $scope.upload[index].abort()
+    $scope.upload[index] = null
+
+  $scope.hasUploader = (index)->
+    $scope.upload[index] != null
+
+  $scope.start = (i)->
+    $scope.progress[i] = 0
+    $scope.errorMsg = null
+    $scope.upload[i] = $upload.upload(
+      url: '/upload'
+      method: 'POST'
+      #headers: {'header-key': 'header-value'},
+      #withCredentials: true,
+      #data: {myObj: $scope.myModelObj},
+      file: $scope.selectedFiles[i]
+      #fileName: 'doc.jpg' or ['1.jpg', '2.jpg', ...] // to modify the name of the file(s)
+      # customize file formData name ('Content-Desposition'), server side file variable name. 
+      #fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file' 
+      # customize how data is added to formData. See #40#issuecomment-28612000 for sample code
+      #formDataAppender: function(formData, key, val){}
+    ).progress((evt)->
+      console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total))
+      $scope.progress[i] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
+    ).success((data, status, headers, config)->
+      # file is uploaded successfully
+      console.log(data)
+    )
+
   $scope.onFileSelect = ($files)->
-    for file in $files
-      $scope.upload = $upload.upload(
-        url: '/upload'
-        method: 'POST'
-        #headers: {'header-key': 'header-value'},
-        #withCredentials: true,
-        #data: {myObj: $scope.myModelObj},
-        file: file, #// or list of files ($files) for html5 only
-        #fileName: 'doc.jpg' or ['1.jpg', '2.jpg', ...] // to modify the name of the file(s)
-        # customize file formData name ('Content-Desposition'), server side file variable name. 
-        #fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file' 
-        # customize how data is added to formData. See #40#issuecomment-28612000 for sample code
-        #formDataAppender: function(formData, key, val){}
-      ).progress((evt)->
-        console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total))
-      ).success((data, status, headers, config)->
-        # file is uploaded successfully
-        console.log(data)
-      )
+    $scope.selectedFiles = []
+    $scope.progress = []
+    if $scope.upload && $scope.upload.length > 0
+      for i in [0...$scope.upload.length]
+        if $scope.upload[i] != null
+          $scope.upload[i].abort()
+    $scope.upload = []
+    $scope.uploadResult = []
+    $scope.selectedFiles = $files
+    for i in [0...$files.length]
+      $scope.start i
 UploadCtrl.$inject = [
   '$scope'
   '$upload'
