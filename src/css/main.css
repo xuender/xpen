@@ -27,3 +27,15 @@ body {
 .dragover {
   border: 5px dashed blue;
 }
+.ta-scroll-window.form-control{
+  min-height: 120px;
+  height: 120px;
+}
+.ta-editor {
+    min-height: 300px;
+    height: auto;
+    overflow: auto;
+    font-family: inherit;
+    font-size: 100%;
+    margin: 10px 0;
+}

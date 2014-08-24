@@ -10,6 +10,18 @@ angular.module('xpen', [
   'LocalStorageModule'
   'hotkey'
   'angularFileUpload'
+  'textAngular'
+]).config(['$provide', ($provide)->
+  $provide.decorator('taOptions', ['taRegisterTool', '$delegate', (taRegisterTool, taOptions)->
+    taRegisterTool('send',
+      iconclass: "fa fa-send"
+      buttontext: '发送'
+      action: ->
+        angular.element('body').scope().send()
+    )
+    taOptions.toolbar[1].push('send')
+    taOptions
+  ])
 ])
 
 XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
@@ -73,7 +85,6 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
         ws.send(
           Command: 'init'
         )
-
     ,->
       console.info '取消'
     )
@@ -169,7 +180,7 @@ XpenCtrl.$inject = [
 
 chatResized = ->
   ### 聊天窗口缩放 ###
-  chat_height = $.getDocHeight() - 130
+  chat_height = $.getDocHeight() - 280
   $('.well').css('height',chat_height)
 $ ->
   $.getDocHeight = ->

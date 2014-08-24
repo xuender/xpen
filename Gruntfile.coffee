@@ -119,6 +119,37 @@ module.exports = (grunt)->
           expand: true
           filter: 'isFile'
         ]
+      fontCss:
+        files: [
+          cwd: 'bower_components/font-awesome/css'
+          src: [
+            'font-awesome.min.css'
+          ]
+          dest: 'src/static/css'
+          expand: true
+          filter: 'isFile'
+        ]
+      font:
+        files: [
+          cwd: 'bower_components/font-awesome/fonts'
+          src: [
+            '*'
+          ]
+          dest: 'src/static/fonts'
+          expand: true
+          filter: 'isFile'
+        ]
+      text:
+        files: [
+          cwd: 'bower_components/textAngular/dist'
+          src: [
+            'textAngular-sanitize.min.js'
+            'textAngular.min.js'
+          ]
+          dest: 'src/static/js'
+          expand: true
+          filter: 'isFile'
+        ]
       #resize:
       #  files: [
       #    cwd: 'bower_components/jquery-resize'
