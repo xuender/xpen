@@ -91,35 +91,28 @@ func chatHandler(ws *websocket.Conn, user User, msg Msg) {
   }
 }
 // 查找用户
-func findUser(p string) User {
+func findUser(p string) (User, *websocket.Conn) {
   for w, u := range onlines {
     if len(u.Nick) > 0{
       if p == fmt.Sprintf("%d", unsafe.Pointer(w)){
-        return u
+        return u, w
       }
     }
   }
-  return User{Nick: "test", Email: "xx@xx"}
+  return User{Nick: "未知用户", Email: "xx@xx"}, nil
 }
 // 发送文件下载 TODO 需要知道谁发送的
-func sendFile(p string, name string, url string){
+func sendFile(p string, url string, name string){
   var msg Msg
+  user, ws := findUser(p)
   msg.Messages = append(msg.Messages, Message{
-    Content: name+"||"+url,
+    Content: "<a target=\"_blank\" href=\"" + url + "\">" + name + "</a>",
     Time: utils.Now(),
-    User: findUser(p),
+    User: user,
   })
   msg.Command = "chat"
-  msg.Source = User{Nick: "xxdfd", Email: "ddf@sf"}
-  for w, u := range onlines {
-    if len(u.Nick) > 0{
-      log.Debugf("发送文件给:%s", u.Nick)
-      if err := websocket.JSON.Send(w, msg); err != nil {
-        log.Error("不能发送文件到客户端")
-        break
-      }
-    }
-  }
+  msg.Source = user
+  chatHandler(ws, user, msg)
 }
 
 // 接收ws请求
@@ -162,11 +155,14 @@ func staticServer(w http.ResponseWriter, r *http.Request) {
   staticHandler.ServeHTTP(w, r)
 }
 
-// 生成上传文件名
-func uploadFile(name string) (string, error) {
-  path := "./static/up/"+uuid.New()
+// 生成上传文件名，及URL地址
+func uploadFile(name string) (string, string, error) {
+  url := "up/" + uuid.New()
+  path := "./static/" + url
   err := os.MkdirAll(path, os.ModePerm)
-  return path + "/" + name, err
+  path = path + "/" + name
+  url = url + "/" + name
+  return path, url, err
 }
 
 // 文件上传请求
@@ -185,7 +181,7 @@ func uploadServer(w http.ResponseWriter, r *http.Request){
     defer file.Close()
     fmt.Fprintf(w, "%v", "ok")
     //TODO
-    fname, mkerr := uploadFile(handler.Filename)
+    fname, url, mkerr := uploadFile(handler.Filename)
     if mkerr != nil {
       log.Errorf("目录操作无权限: %s", err)
       return
@@ -197,7 +193,7 @@ func uploadServer(w http.ResponseWriter, r *http.Request){
     }
     defer f.Close()
     io.Copy(f, file)
-    sendFile(r.FormValue("pointer"), fname, handler.Filename)
+    sendFile(r.FormValue("pointer"), url, handler.Filename)
   }
 }
 

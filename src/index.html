@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html ng-app="xpen" ng-csp>
   <head>
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
@@ -55,7 +55,7 @@
         <table class="table table-striped">
           <tr ng-repeat="m in messages">
             <td class="col-xs-2">{{ m.User.Nick }}</td>
-            <td>{{ m.Content }}</td>
+            <td ng-bind-html="m.Content"></td>
             <td class="col-xs-2">{{ m.Time }}</td>
           </tr>
         </table>

@@ -12,7 +12,7 @@ angular.module('xpen', [
   'angularFileUpload'
 ])
 
-XpenCtrl = ($scope, $modal, ngSocket, lss, $upload)->
+XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
   ### 主控制器 ###
   $scope.msg = ''
   $scope.pointer = ''
@@ -22,8 +22,11 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload)->
   $scope.progress = []
   $scope.showMessages = (messages)->
     ### 显示消息 ###
-    console.info messages
-    $scope.messages = $scope.messages.concat messages
+    if messages
+      for i in [0...messages.length]
+        messages[i].Content = $sce.trustAsHtml(messages[i].Content)
+      console.info messages
+      $scope.messages = $scope.messages.concat messages
   ws.onMessage((data)->
     dmsg = JSON.parse(data.data)
     $('.well')[0].scrollTop = $('.well')[0].scrollHeight
@@ -92,7 +95,7 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload)->
 
   $scope.send = ->
     ### 发送消息 ###
-    console.info $scope.msg
+    console.info $sce.trustAsHtml($scope.msg)
     if $scope.msg
       ws.send(
         Command: 'chat'
@@ -161,6 +164,7 @@ XpenCtrl.$inject = [
   'ngSocket'
   'localStorageService'
   '$upload'
+  '$sce'
 ]
 
 chatResized = ->
