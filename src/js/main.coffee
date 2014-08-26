@@ -32,6 +32,7 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
   $scope.users = []
   $scope.messages = []
   $scope.progress = []
+  $scope.tabs = ['大厅','张三'] #TODO 修改成对象，包含messages数组,和msg对象
   $scope.showMessages = (messages)->
     ### 显示消息 ###
     if messages
@@ -41,7 +42,6 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
       $scope.messages = $scope.messages.concat messages
   ws.onMessage((data)->
     dmsg = JSON.parse(data.data)
-    $('.well')[0].scrollTop = $('.well')[0].scrollHeight
     switch dmsg.Command
       when 'users'
         $scope.pointer = dmsg.Pointer
@@ -124,6 +124,8 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
       Command: 'login'
       Source: $scope.user
     )
+  $scope.closeChat = ->
+    console.info 'xxx'
   $scope.init()
   $scope.abort = (index)->
     ### 停止 ###
@@ -180,9 +182,13 @@ XpenCtrl.$inject = [
 
 chatResized = ->
   ### 聊天窗口缩放 ###
-  chat_height = $.getDocHeight() - 280
+  chat_height = $.getDocHeight() - 330
   $('.well').css('height',chat_height)
 $ ->
+  $("table").resize((e)->
+    div = $(e.target).parent()[0]
+    div.scrollTop = div.scrollHeight
+  )
   $.getDocHeight = ->
     Math.max($(document).height(), $(window).height(), document.documentElement.clientHeight)
   chatResized()

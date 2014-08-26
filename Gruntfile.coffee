@@ -150,16 +150,16 @@ module.exports = (grunt)->
           expand: true
           filter: 'isFile'
         ]
-      #resize:
-      #  files: [
-      #    cwd: 'bower_components/jquery-resize'
-      #    src: [
-      #      'jquery.ba-resize.min.js'
-      #    ]
-      #    dest: 'src/static/js'
-      #    expand: true
-      #    filter: 'isFile'
-      #  ]
+      resize:
+        files: [
+          cwd: 'bower_components/jquery-resize'
+          src: [
+            'jquery.ba-resize.min.js'
+          ]
+          dest: 'src/static/js'
+          expand: true
+          filter: 'isFile'
+        ]
       css:
         files: [
           cwd: 'src/css'
