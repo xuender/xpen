@@ -30,6 +30,8 @@ type Msg struct {
 	Source User
   // 来源
   Pointer string
+  // 目标用户
+  To string
 }
 
 // ws消息

@@ -44,6 +44,7 @@ func initHandler(ws *websocket.Conn, user User, msg Msg) {
   var m Msg
   m.Command = "chat"
   m.Messages = messages
+  m.To = ""
   m.Pointer = fmt.Sprintf("%d", unsafe.Pointer(ws))
   if err = websocket.JSON.Send(ws, m); err != nil {
     log.Error("不能发送消息到客户端")
@@ -81,7 +82,7 @@ func chatHandler(ws *websocket.Conn, user User, msg Msg) {
     messages = messages[1:11]
   }
   for w, u := range onlines {
-    if len(u.Nick) > 0{
+    if len(u.Nick) > 0 && (msg.To == "" || msg.To == fmt.Sprintf("%d", unsafe.Pointer(w))){
       log.Debugf("发送消息给:%s", u.Nick)
       if err = websocket.JSON.Send(w, msg); err != nil {
         log.Error("不能发送消息到客户端")

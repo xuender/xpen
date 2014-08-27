@@ -26,27 +26,35 @@ angular.module('xpen', [
 
 XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
   ### 主控制器 ###
-  $scope.msg = ''
   $scope.pointer = ''
   ws = ngSocket("ws://#{location.origin.split('//')[1]}/ws")
   $scope.users = []
   $scope.messages = []
   $scope.progress = []
-  $scope.tabs = ['大厅','张三'] #TODO 修改成对象，包含messages数组,和msg对象
-  $scope.showMessages = (messages)->
+  $scope.tabs = [{
+    name: '聊天室'
+    messages: []
+    msg: ''
+    to: ''
+    active: true
+  }]
+  $scope.showMessages = (messages, to)->
     ### 显示消息 ###
     if messages
       for i in [0...messages.length]
         messages[i].Content = $sce.trustAsHtml(messages[i].Content)
       console.info messages
-      $scope.messages = $scope.messages.concat messages
+      console.info to
+    for t in $scope.tabs
+      if to == t.to
+          t.messages = t.messages.concat messages
   ws.onMessage((data)->
     dmsg = JSON.parse(data.data)
     switch dmsg.Command
       when 'users'
         $scope.pointer = dmsg.Pointer
         $scope.users = dmsg.Users
-      when 'chat' then $scope.showMessages(dmsg.Messages)
+      when 'chat' then $scope.showMessages(dmsg.Messages, dmsg.To)
   )
   $scope.isLogin = false
   $scope.init = ->
@@ -106,17 +114,22 @@ XpenCtrl = ($scope, $modal, ngSocket, lss, $upload, $sce)->
 
   $scope.send = ->
     ### 发送消息 ###
-    console.info $sce.trustAsHtml($scope.msg)
-    if $scope.msg
-      ws.send(
-        Command: 'chat'
-        Messages: [
-          {
-            Content: $scope.msg
-          }
-        ]
-      )
-      $scope.msg = ''
+    #console.debug $scope.tabs
+    for t in $scope.tabs
+      if t.active
+        #console.info $sce.trustAsHtml(t.msg)
+        #console.info t.msg
+        if t.msg
+          ws.send(
+            Command: 'chat'
+            To: t.to
+            Messages: [
+              {
+                Content: t.msg
+              }
+            ]
+          )
+          t.msg = ''
   $scope.wsLogin = ->
     ### 远程用户登陆 ###
     console.info('login', $scope.user)
